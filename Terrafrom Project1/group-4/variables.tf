@@ -54,17 +54,24 @@ variable "instance_type_t2large" {
 
 variable "ingress_rules" {
   default = {
-    "my ingress rule" = {
+    "80" = {
       description = "For HTTP"
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
-    "my other ingress rule" = {
+    "22" = {
       description = "For SSH"
       from_port   = 22
       to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "8080" = {
+      description = "For Jenkins"
+      from_port   = 8080
+      to_port     = 8080
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     }

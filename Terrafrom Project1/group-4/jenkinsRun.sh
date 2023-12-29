@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get admin privileges
-sudo su
+# sudo su
 
 sudo yum install wget -y
 
