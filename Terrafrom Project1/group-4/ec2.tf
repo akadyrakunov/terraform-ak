@@ -27,12 +27,21 @@ resource "aws_instance" "web" {
 
 resource "time_sleep" "wait_300_seconds" {
   create_duration = "300s"
+
+  # depends_on = [ aws_instance.web ]
 }
 
 resource "terraform_data" "copyJenkinsToNewEC2" {
   provisioner "local-exec" {
     command = "scp ${"jenkinsRun.sh"} ec2-user@${aws_instance.web.public_ip}:"
    }
-   depends_on = [ time_sleep.wait_300_seconds ]
+    depends_on = [ time_sleep.wait_300_seconds ]
+}
+
+resource "terraform_data" "executeJenkinsFile" {
+  provisioner "local-exec" {
+    command = "ssh ec2-user@${aws_instance.web.public_ip} bash jenkinsRun.sh"
+   }
+   depends_on = [ terraform_data.copyJenkinsToNewEC2]
 }
 
