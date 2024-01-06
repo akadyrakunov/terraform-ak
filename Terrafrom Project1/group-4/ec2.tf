@@ -25,17 +25,31 @@ resource "aws_instance" "web" {
   }
 }
 
-resource "time_sleep" "wait_300_seconds" {
-  create_duration = "300s"
+resource "time_sleep" "wait_60_seconds" {
+  create_duration = "60s"
 
   # depends_on = [ aws_instance.web ]
+}
+
+resource "terraform_data" "StrictHostKeyCheckingFalse" {
+  provisioner "local-exec" {
+    command = "ssh -o StrictHostKeyChecking=no ec2-user@${aws_instance.web.public_ip}"
+   }
+    depends_on = [ time_sleep.wait_60_seconds ]
+}
+
+resource "terraform_data" "exitSSH" {
+  provisioner "local-exec" {
+    command = "exit"
+   }
+    depends_on = [ terraform_data.StrictHostKeyCheckingFalse ]
 }
 
 resource "terraform_data" "copyJenkinsToNewEC2" {
   provisioner "local-exec" {
     command = "scp ${"jenkinsRun.sh"} ec2-user@${aws_instance.web.public_ip}:"
    }
-    depends_on = [ time_sleep.wait_300_seconds ]
+    depends_on = [ terraform_data.StrictHostKeyCheckingFalse]
 }
 
 resource "terraform_data" "executeJenkinsFile" {
